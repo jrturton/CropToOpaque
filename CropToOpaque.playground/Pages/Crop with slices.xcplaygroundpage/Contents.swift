@@ -40,8 +40,8 @@ func alphaFromImage(image: CIImage, context: CIContext) -> Float {
     return alpha
 }
 
-func firstNonAlphaSliceInImage(image: CIImage, slices: [CGRect]) -> CGFloat {
-    for (index, slice) in slices.enumerate() {
+func firstNonAlphaSliceInImage(image: CIImage, startEdge: CGRectEdge) -> CGFloat {
+    for (index, slice) in image.extent.slicesFromEdge(startEdge).enumerate() {
         maxAlpha.setValue(CIVector(CGRect:slice), forKey: kCIInputExtentKey)
         let maxAlphaImage = maxAlpha.outputImage!
         let alpha = alphaFromImage(maxAlphaImage, context: context)
@@ -52,10 +52,10 @@ func firstNonAlphaSliceInImage(image: CIImage, slices: [CGRect]) -> CGFloat {
     return 0
 }
 
-let topInset = firstNonAlphaSliceInImage(ciImage, slices: horizontalSlices)
-let bottomInset = firstNonAlphaSliceInImage(ciImage, slices: horizontalSlices.reverse())
-let leftInset = firstNonAlphaSliceInImage(ciImage, slices: verticalSlices)
-let rightInset = firstNonAlphaSliceInImage(ciImage, slices: verticalSlices.reverse())
+let topInset = firstNonAlphaSliceInImage(ciImage, startEdge: .MinYEdge)
+let bottomInset = firstNonAlphaSliceInImage(ciImage, startEdge: .MaxYEdge)
+let leftInset = firstNonAlphaSliceInImage(ciImage, startEdge: .MinXEdge)
+let rightInset = firstNonAlphaSliceInImage(ciImage, startEdge: .MaxXEdge)
 
 let cropInsets = UIEdgeInsets(top: topInset, left: leftInset, bottom: bottomInset, right: rightInset)
 let croppedRect = UIEdgeInsetsInsetRect(ciImage.extent, cropInsets)
